@@ -1,0 +1,80 @@
+c库提供了基于流的文件操作函数
+
+#include <stdio.h>
+
+1.文件创建，打开，关闭
+/*
+1.路径名
+2.文件的打开模式
+r 只读方式打开文件，文件指针位于文件首
+r+ 读写方式打开文件，文件指针位于文件首
+w 只写方式打开 文件存在，清空文件，不存在，创建新文件 文件指针位于文件首
+w+ 读写方式打开文件 文件存在，清空文件，不存在，创建新文件 文件指针位于文件首
+a 追加写的方式打开 不存在，创建新文件 文件打开时文件指针位于文件尾，每次写，指针都会移动到文件尾
+a+ 追加写的方式打开 文件存在，清空文件，不存在，创建新文件   文件打开时文件指针位于文件尾，每次写，指针都会移动到文件尾
+被创建的文件的访问权限是0666
+*/
+FILE *fopen(const char* path,const char* mode);//成功返回文件句柄，否则NULL
+
+int fclose(FILE* fp);//成功0 失败非0值
+
+
+2.按字符读写文件
+//用unsigned char的格式读取一个字符并映射为int值返回，否则读取错误或遇到文件结束标志EOF时返回EOF（－1）
+int fgetc(FILE* stream);
+
+int fputc(int c,FILE* stream);//写入成功返回写入的字符的值，失败返回EOF
+
+3.按字符串读写文件
+//从文件中读入以\0或EOF结尾的字符串
+/*
+1.读出来的字符串的地址
+2.1次最多读取size个字符
+*/
+char *fgets(char *s,int size,FILE* fd);//成功返回读取的字符串      错误，读到文件尾，没读到任何字符返回NULL
+
+int fputs(const char* str,FILE* fd);//成功返回非负整数，失败EOF
+
+4.按数据块读写文件  读写速度快 推荐＃＃＃
+对于二进制文件，需要读写一组数据时使用
+
+/*
+1.要读写的数据地址
+2.数据块大小
+3.数据块数目
+4。文件句柄
+*/
+//成功返回成功读写的数据块数量 数量小于第三个参数表示错误或读文件遇到了文件结束符EOF，这时fread无法区分是出错还是遇到EOF，用feof()判断是否读到了文件尾，ferror()判断是否出错
+size_t fread(void *ptr,size_t size,size_t nmemb,FILE* fd);
+size_t fwrite(const void *ptr,size_t size,size_t nmemb,FILE* fd);
+
+float f[10];
+//省略给f赋值
+int i = fwrite(f,sizeof(float),10,fd);//i=10 1个浮点数为1个数据块
+i = fread(f,sizeof(f),1,fd);//i=1  10个浮点数为一个数据块
+
+5.文件格式化输入，输出   效率不高，不推荐＃＃＃ 
+eg:fscanf()读取的是字符串，需转换成二进制才能存入内存，输入时，将二进制数转换成字符串才能输出到文件
+
+int fprintf(FILE* fd,const char* format,...);//成功返回实际写入文件的字符数 错误返回负数
+int fscanf(FILE* fd,const char* format,...);//读出数据到缓冲区
+
+eg:
+char* buf[9];
+fscanf(fd,"%10s%10s%10s",buf[i],buf[i+1],buf[i+2]);
+
+
+6.文件随机存取
+/*
+1.文件描述符
+2.指针移动的偏移量（字节数）
+3.文件指针移动偏移量的解释  SEEK_SET(文件头开始计算，文件指针移动到offset个字节位置),SEEK_CUR（从文件指针当前位置开始计算，向后移动offset个字节的位置）
+,SEEK_END（文件指针移动到文件末尾）
+*/
+int fseek(FILE* fd,long offset,int whence);//移动文件指针成功返回0 失败－1
+
+long ftell(FILE* fd);//获取当前指针的位置  成功返回文件指针的当前位置，失败－1
+
+//获取或设置文件指针位置，文件指针的位置或返回都通过第二个参数pos传递  和fseek()指定SEEK_SET的参数的功能一样
+int fgetpos(FILE* fd,fpos_t *pos);
+int fsetpos(FILE* fd,fpos_t *pos);

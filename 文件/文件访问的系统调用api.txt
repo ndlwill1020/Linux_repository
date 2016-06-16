@@ -1,0 +1,84 @@
+1.open()或create()  都可以创建并打开一个文件   成功返回非负整数,失败-1
+
+
+#include <fcntl.h>
+open(const char* pathName,int flags);
+/*
+1.创建或打开的文件路径名
+2.标志 必须指定O_RDONLY(只读方式打开文件),O_WRONLY（只写）,O_RDWR（读写）
+3.新建文件的访问权限  只被应用于将来对＃新文件＃的使用中，open调用创建新的只读文件，但仍返回一个可读写文件描述符＃＃＃
+*/
+open(const char* pathName,int flags,mode_t mode);
+
+create(const char* pathName,mode_t mode);//相当于open使用了O_CREAT|O_WRONLY|O_TRUNC
+eg：
+int fd ＝ open("/tmp/test",O_CREAT|O_WRONLY|O_TRUNC,0640);
+
+O_CREAT  如果文件不存在，按照mode指定文件权限来创建文件
+O_TRUNC  如果打开的文件是已经存在的普通文件＃，并指定了写的标志，打开文件时消除源文件的所有内容
+O_NONBLOCK 文件打开后，对这个文件描述符的所有操作都以非阻塞方式进行
+
+flags可通过fcntl()系统调用来改变
+
+2.int close(int fd) 关闭指定文件描述符的文件  成功0 失败返回－1
+
+3.
+//成功返回读取的字节数 失败－1  如果读到了文件的末尾或被信号中断，返回值小于count 当文件指针位于文件结尾，返回0   errno ＝ EINTR表示被信号中断
+ssize_t read(int fd,void *buf,size_t count);//从文件描述符fd所引用的文件中读取count字节到buf缓冲区    buf的长度>=count
+
+//成功返回实际写入字节数
+ssize_t write(int fd,const void *buf,size_t count);//从buf中写count字节到文件描述符fd所引用的文件中
+
+4.
+//文件随机存取
+文件被打开时，都有文件指针表明当前的存取位置。一般都位于头部，除非指定了O_APPEND（追加模式，文件指针定位到文件末尾）标志
+/*
+1.文件描述符
+2.移动的偏移量（字节数）
+3.文件指针移动偏移量的解释  SEEK_SET(文件头开始计算，文件指针移动到offset个字节位置),SEEK_CUR（从文件指针当前位置开始计算，向后移动offset个字节的位置）
+,SEEK_END（文件指针移动到文件末尾）
+*/
+off_t lseek(int fildes,off_t offset,int whence);//成功返回文件指针当前位置，失败－1
+
+获取文件大小
+int fileSize = lseek(fd,0,SEEK_END);
+
+5.
+//判断一个文件具有的权限
+/*
+//mode  R_OK(文件是否有读权限),W_OK(写),X_OK（可执行）,F_OK (存在）
+*/
+int access(const char* pathName,int mode);//成功返回0 有一个不符返回－1
+
+6.
+修改文件属性
+文件描述符包含了文件描述符标志和当前进程对文件的访问权限等等
+
+//修改文件描述符中包含的标志
+/*
+cmd 制定了函数的操作
+cmd = F_DUPFD 复制文件描述符  新的描述符作为返回值返回
+F_GETFD/F_SETFD 获取/设置文件描述符标志   
+F_GETFL/F_SETFL 获取/设置文件描述符对应的文件标志  O_NONBLOCK等这些（就是open()函数中的flags）  ＃＃＃
+F_GETLK/F_SETLK 获取/设置文件锁  这个涉及struct flock *flock
+*/
+int fcntl(int fd,int cmd);
+int fcntl(int fd,int cmd,long arg);
+int fcntl(int fd,int cmd,struct flock *flock);
+
+eg:对文件描述符的文件标志进行打开或关闭
+
+setFlag(fd,O_APPEND,true)
+
+void setFlag(int fd,int flags,bool isOn｛
+	int originFlag;
+	originFlag = fcntl(fd,F_GETFL,0);
+
+	if(isOn){
+		originFlag |= flags;
+	}else{
+		originflag &= ~flags;
+	}
+
+	fcntl(fd,F_SETFL,originFlag);
+｝
