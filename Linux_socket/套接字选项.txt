@@ -1,0 +1,31 @@
+#include <sys/socket.h>
+int setsockopt(int sockfd, int level,int optname,void* optval,socklen_t optlen);
+int getsockopt(int sockfd, int level,int optname,const void* optval,socklen_t optlen);
+//都是成功返回0 失败－1并设置errno
+
+
+int setsockopt(int sockfd, int level,int optname,void* optval,socklen_t optlen);
+参数解析：
+level:  对于socket编程：level一般为SOL_SOCKET
+optname:  选项名
+optval: 指向存放选项值的缓冲区
+optlen:optval缓冲区长度
+
+
+选项名称　　　　　　　　说明　　　　　　　　　　　　　　　　　　数据类型
+SO_KEEPALIVE　　　　　　保持连接　　　　　　　　　　　　　　　　int
+SO_LINGER　　　　　　　 延迟关闭连接　　　　　　　　　　　　　　struct linger
+－－－－－－－－－－－－－－－－－－－
+SO_KEEPALIVE  检测对端是否处于连接中  (心跳机制)
+eg:
+int optval = 1;
+setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
+
+
+SO_LINGER选项用来设置当调用closesocket时是否马上关闭socket
+eg:
+//某些具体程序要求待未发送完的数据发送出去后再关闭socket，可通过设置让程序满足要求：
+struct linger so_linger;
+so_linger.l_onoff = 1;//表示是否延时关闭socket  l_onoff为0，则延迟关闭特性就被取消
+so_linger.l_linger = 500;//设置等待时间  单位为秒
+setsockopt(clientSocket, SOL_SOCKET, SO_LINGER, (const char*)&so_linger, sizeof(so_linger));

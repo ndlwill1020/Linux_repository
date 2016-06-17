@@ -1,0 +1,124 @@
+Socket是程序间通讯(IPC, Internet Process Connection)的方法
+这意味着Socket是用来让一个进程和其他的进程互相通讯的
+
+其实TCP/IP协议族已经帮我们解决了这个问题，网络层的“ip地址”可以唯一标识网络中的主机，而传输层的“协议+端口”可以唯一标识主机中的应用程序（进程）。这样利用三元组（ip地址，协议，端口）就可以标识网络的进程了，网络中的进程通信就可以利用这个标志与其它进程进行交互。
+
+而Unix/Linux基本哲学之一就是“一切皆文件”，都可以用“打开open –> 读写write/read –> 关闭close”模式来操作。我的理解就是Socket就是该模式的一个实现，socket即是一种特殊的文件，一些socket函数就是对其进行的操作（读/写IO、打开、关闭），
+
+void *memset(void *s, int ch, size_t n);
+函数解释：将s中前n个字节 （typedef unsigned int size_t ）用 ch 替换并返回 s 。
+memset：作用是在一段内存块中填充某个给定的值，它是对较大的结构体或数组进行清零操作的一种最快方法
+
+void *memcpy(void *dest, const void *src, size_t n);
+memcpy函数的功能是从源src所指的内存地址的起始位置开始拷贝n个字节到目标dest所指的##内存地址的起始位置中##。
+
+
+IP & 域名：
+DNS即为域名解析服务
+主机名由称为 DNS 服务器或域名服务器的服务器映射到 IP 地址。DNS 代表域名服务。在大型网络中，许多 DNS 服务器可以相互协作，以提供主机名和 IP 地址之间的映射。
+
+域名：
+以一个常见的域名为例说明，baidu网址是由二部分组成，标号“baidu”是这个域名的主体，而最后的标号“com”则是该域名的后缀，代表的这是一个com国际域名，是顶级域名。而前面的www.是网络名， 为www的域名。
+
+baidu
+主机名就是计算机的名字（计算机名）
+主机名有时称为域名
+
+网络中计算机的唯一性可以通过一个IP地址（32位无符号整形数）进行标识
+点分十进制IP（将32位地址按8位分为4组）：192.168.2.1  （0xc0a80201）  
+也可以用域名表示eg:www.XXX.com 最右边的域com代表商业机构，edu代表教育，org代表非营利性组织，gov代表政府机构
+11000000  10101000  00000010  00000001
+0xc0      0xa8		0x02	  0x01
+192		  168		2		  1
+
+一个计算机中的某个进程则可以通过一个无符号整数（端口号）来标识
+
+所以一个网络中的进程可以通过IP地址+端口号的方式进行标识
+
+1.地址
+<sys/socket.h>
+
+//typedef unsigned char		__uint8_t;
+//typedef __uint8_t		sa_family_t;
+//通用地址结构
+struct sockaddr {
+	__uint8_t	sa_len;		/* total length */
+	sa_family_t	sa_family;	/* [XSI] address family */
+	char		sa_data[14];	/* [XSI] addr value (actually larger) */
+};
+－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+为了方便设置用于网络通信的socket地址，引入了sockaddr_in结构体
+//typedef	__uint16_t		in_port_t;
+//typedef	unsigned short		__uint16_t;
+/*
+//typedef	__uint32_t	in_addr_t;//typedef 定别名
+//typedef unsigned int		__uint32_t;
+struct in_addr {
+	in_addr_t s_addr;
+};
+*/
+//IPv4地址族结构  #include <netinet/in.h>
+struct sockaddr_in {
+	__uint8_t	sin_len;
+	sa_family_t	sin_family;//地址族类型
+	in_port_t	sin_port;//端口 （网络字节序）
+	struct	in_addr sin_addr;//IPv4地址值 （地址值为网络字节序）
+	char		sin_zero[8];
+};
+在实际编程的时候，经常需要将sockaddr_in强制转换成sockaddr类型
+
+eg:
+struct sockaddr_in s_addr_in;
+char buf[16];//test inet_ntop()
+memset(&s_addr_in, 0, sizeof(s_addr_in));
+s_addr_in.sin_family = AF_INET;
+s_addr_in.sin_port = htons(45683);
+//s_addr_in.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr()  将字符串转换成网络字节序的IPv4地址 不推荐＃＃＃
+用下面的 它不仅可以用于转换IPv4地址，还可以用来转换IPv6的地址
+#include <arpa/inet.h>
+inet_pton(<#int#>, <#const char *#>, <#void *#>)//把字符串转换成ip地址(网络字节序 32位整数)保存在dst中 调用成功返回大于0的整数  void*表示“任意类型的指针”
+//转换IPv4的地址
+if(inet_pton(AF_INET, "192.168.2.1", &s_addr_in.sin_addr.s_addr) <= 0){//
+	//error TODO
+}
+
+inet_ntop(<#int#>, <#const void *#>, <#char *#>, <#socklen_t#>)//将网络字节序的ip地址转换成字符串保存在buf中作为返回值返回
+%s  inet_ntop(AF_INET, &s_addr_in.sin_addr.s_addr, buf, sizeof(buf))
+
+char *inet_ntoa(struct in_addr in);//网络字节序转换   返回字符串
+
+
+2.端口
+在网络编程中的端口其实是一个标识而已
+
+3.网络字节序(字节序又叫端序)
+小端序是指低字节位存放在内存地址的低端，大端序是指高位字节存放在内存的低端
+比如一个4字节的整数 16进制形式为 0x12345678（最左边是高位字节）
+
+内存地址  低端－》高端
+大端序：
+12	34	56	78
+小端序：
+78	56	34	12
+
+TCP/IP 各层协议将字节序使用的是大端序，我们把TCP/IP协议中使用的字节序称之为网络字节序
+
+#define ntohs(x)   __DARWIN_OSSwapInt16(x) // 16位整数 网络字节序转主机字节序  
+#define htons(x)   __DARWIN_OSSwapInt16(x) // 16位整数 主机字节序转网络字节序  
+#define ntohl(x)   __DARWIN_OSSwapInt32(x)  //32位整数 网络字节序转主机字节序  
+#define htonl(x)   __DARWIN_OSSwapInt32(x) //32位整数 主机字节序转网络字节序
+n代表netwrok， h代表host ，s代表short，l代表long
+
+4.网络模型
+服务端：
+创建socket
+将socket和本地的地址端口绑定
+开始监听
+握手成功，接受请求，得到一个新的socket，通过它可以和客户端通讯
+客户端：
+创建socket和服务器的地址，通过它们向服务器发送连接请求
+连接成功，客户端的socket会绑定到系统分配的一个端口上，和服务端进行通讯
+
+5.地址族
+为套接字选定一个地址族（告诉套接字使用哪一种网络层进行通讯 IPv4或IPv6）
+AF_INET用于IPv4   AF_INET6用于IPv6

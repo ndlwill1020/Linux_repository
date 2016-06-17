@@ -1,0 +1,18 @@
+#include <netdb.h>
+
+struct hostent {
+	char	*h_name;	/* official name of host */ //主机的正式名
+	char	**h_aliases;	/* alias list */ //主机的别名列表 是个指针数组，它以NULL指针结尾
+	int	h_addrtype;	/* host address type */   //主机地址族类型 AF_INET或AF_INET6
+	int	h_length;	/* length of address */   //地址的长度 如果返回的是IPv4地址，长度是4
+	char	**h_addr_list;	/* list of addresses from name server */  //返回主机的地址列表 以网络字节序存储
+	char	**h_addr_list;	/* list of addresses from name server */
+#if !defined(_POSIX_C_SOURCE) || defined(_DARWIN_C_SOURCE)
+#define	h_addr	h_addr_list[0]	/* address, for backward compatibility */  //h_addr_list中的第一地址
+#endif /* (!_POSIX_C_SOURCE || _DARWIN_C_SOURCE) */
+};
+
+
+
+
+见Demo      Domain2NetworkByteOrder
