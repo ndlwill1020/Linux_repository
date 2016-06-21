@@ -1,0 +1,15 @@
+当信号量大于0时，函数sem_wait()才能返回，并将信号量减1
+当信号量等于0时，函数sem_wait()将被阻塞，直到信号量大于0
+
+#include <semaphore.h>
+/*
+1.指向信号量结构的指针
+2.不为0，此信号量在进程间共享，为0，只能为当前进程的所有线程共享
+3.信号量初始值
+*/
+int sem_init(sem_t *sem, int pshared,unsigned value);
+
+int sem_post(sem_t *sem); 增加信号量
+int sem_wait(sem_t *sem);//用来阻塞当前线程直到信号量sem大于0，解除阻塞后将sem的值减1
+
+int sem_destroy(sem_t *sem);//释放

@@ -1,0 +1,38 @@
+线程:一个进程内部的一个控制序列
+
+编译多线程程序的时候，需要链接libpthread
+gcc -o pthread_test -lpthread
+
+1.创建线程
+#include <pthread.h>
+
+/*
+1.指向线程标识符的指针
+2.线程属性 不设置置NULL
+3.线程运行函数的起始地址  函数指针
+4.运行函数的参数
+*/
+int pthread_create(pthread_t *pid,const pthread_attr_t *attr,void* (*start_routine)(void *),void *arg);//返回值：成功0 失败不为0
+
+2.主线程等待线程结束
+/*
+1.被等待的线程表示符
+2.用户定义的指针
+*/
+int pthread_join(pthread_t thread, void **value_ptr);//阻塞函数
+
+3.线程结束
+void pthread_exit(void *value_ptr);//函数的参数是函数的返回代码  pthread_join第二个参数不为空，这个值将被传递给主线程
+
+main(){
+	void *result;
+	pthread_t id;
+	pthread_create(&id, NULL, (void *)thread, NULL);
+	pthread_join(id, &result);
+	printf("%d",(int)result);//3
+}
+
+void thread(void){
+	int i = 3;
+	pthread_exit((void *)i);
+}

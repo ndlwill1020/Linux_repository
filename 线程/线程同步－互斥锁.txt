@@ -1,0 +1,15 @@
+用于控制对共享资源的存取
+
+1.生成
+/*
+1.互斥变量地址
+2.设置互斥变量的属性 默认属性传入NULL
+*/
+int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+
+2.直到pthread_mutex_unlock()为止，均被上锁，即同一时间只能被一个线程调用，另外的线程阻塞
+int pthread_mutex_lock(pthread_mutex_t *mutex);//上锁
+int pthread_mutex_unlock(pthread_mutex_t *mutex);
+
+3.释放
+pthread_mutex_destroy();

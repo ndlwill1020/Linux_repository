@@ -1,0 +1,30 @@
+条件变量一般和互斥锁一起使用
+
+1.初始化
+/*
+1.指向结构pthread_cond_t的指针
+2.指向结构pthread_condattr_t（条件变量的属性）的指针，用来设置条件变量是进程内可用还是进程间可用，默认值是PTHREAD_PROCESS_PRIVATE，即被同一进程内的各个线程使用
+*/
+int pthreadcond_init(pthread_cond_t *cond,const pthread_condattr_t *attr);
+
+
+2.释放
+int pthread_cond_destroy(pthread_cond_t *cond);
+
+3.
+用条件变量阻塞线程
+/*
+1.条件变量指针
+2.线程阻塞的时候要解开的互斥锁
+*/
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
+
+//多了个时间参数，当线程被锁定超过abstime时间后，即时条件变量不满足，阻塞线程也会被唤醒
+int pthread_cond_timewait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec* abstime);
+
+
+4.唤醒线程(被阻塞在条件变量上的线程)
+
+//当多个线程被同一条件变量阻塞时，broadcast可以使所有线程被唤醒，signal则是哪个线程被唤醒，是由线程调度策略所决定的
+int pthread_cond_broadcast(pthread_cond_t *cond);
+int pthread_cond_signal(pthread_cond_t* cond);
