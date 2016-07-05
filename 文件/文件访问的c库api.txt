@@ -75,6 +75,11 @@ int fseek(FILE* fd,long offset,int whence);//移动文件指针成功返回0 失
 
 long ftell(FILE* fd);//获取当前指针的位置  成功返回文件指针的当前位置，失败－1
 
+void rewind(FILE *stream);
+功 能: 将文件内部的位置指针重新指向文件的开头
+注意：不是文件指针而是文件内部的位置指针，随着对文件的读写文件的位置指针（指向当前读写字节）向后移动。
+rewind函数作用等同于 (void)fseek(stream, 0L, SEEK_SET);
+
 //获取或设置文件指针位置，文件指针的位置或返回都通过第二个参数pos传递  和fseek()指定SEEK_SET的参数的功能一样
 int fgetpos(FILE* fd,fpos_t *pos);
 int fsetpos(FILE* fd,fpos_t *pos);
