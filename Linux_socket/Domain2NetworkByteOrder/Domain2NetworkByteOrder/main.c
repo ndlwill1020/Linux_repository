@@ -49,6 +49,7 @@ int main(int argc, const char * argv[]) {
     char ip2[16] = {0};
     inet_ntop(hptr->h_addrtype, (hptr->h_addr_list)[0], ip1, sizeof(ip1));
     inet_ntop(hptr->h_addrtype, (hptr->h_addr_list)[1], ip2, sizeof(ip2));
+    printf("addr:%s\n",(hptr->h_addr_list)[0]);//乱码
     printf("ip1:%s ip2:%s\n",ip1,ip2);
     
     
