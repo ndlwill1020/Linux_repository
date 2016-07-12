@@ -41,7 +41,38 @@ int main(int argc, const char * argv[]) {
     
     for (addrs = hptr->h_addr_list; *addrs != NULL; addrs++) {
         printf("\t address:%s\n",inet_ntop(hptr->h_addrtype, *addrs, str, sizeof(str)));//将网络字节序转换成字符串 *addrs是个char *类型 就是最终输出的字符串
+        
+        printf("str:%s\n",str);
     }
+    printf("===============我是分割线===============\n");
+    char ip1[16] = {0};
+    char ip2[16] = {0};
+    inet_ntop(hptr->h_addrtype, (hptr->h_addr_list)[0], ip1, sizeof(ip1));
+    inet_ntop(hptr->h_addrtype, (hptr->h_addr_list)[1], ip2, sizeof(ip2));
+    printf("ip1:%s ip2:%s\n",ip1,ip2);
+    
+    
+    printf("===============我是分割线===============\n");
+    unsigned char* p = (unsigned char *)(hptr->h_addr_list)[0];
+    if( p != NULL )
+    {
+        char ip[16] = {0};
+        sprintf(ip, "%u.%u.%u.%u", p[0], p[1], p[2], p[3]);
+        printf("ip:%s\n",ip);
+    }
+    
+    printf("===============我是分割线===============\n");
+    struct addrinfo hint;
+    memset(&hint, 0, sizeof(hint));
+    
+    struct addrinfo* answer = NULL;
+    getaddrinfo(argv[1], NULL, NULL, &answer);
+    char hostname[1025] = "";
+    
+    getnameinfo(answer->ai_addr,answer->ai_addrlen,hostname,1025,NULL,0,0);
+    char ipv6[128] = "";
+    memcpy(ipv6,hostname,128);
+    printf("hostname:%s\n",hostname);
     
     return 0;
 }

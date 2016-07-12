@@ -1,0 +1,43 @@
+struct sockaddr_in6 {
+	__uint8_t	sin6_len;	/* length of this struct(sa_family_t) */
+	sa_family_t	sin6_family;	/* AF_INET6 (sa_family_t) */
+	in_port_t	sin6_port;	/* Transport layer port # (in_port_t) */
+	__uint32_t	sin6_flowinfo;	/* IP6 flow information */
+	struct in6_addr	sin6_addr;	/* IP6 address */
+	__uint32_t	sin6_scope_id;	/* scope zone index */
+};
+
+
+#include <netdb.h>
+/*
+hostname:一个主机名或者地址串(IPv4的点分十进制串或者IPv6的16进制串)
+service：服务名可以是十进制的端口号，也可以是已定义的服务名称，如ftp、http等
+hints(线索，提示)：可以是一个空指针，也可以是一个指向某个addrinfo结构体的指针，调用者在这个结构中填入关于期望返回的信息类型的暗示。举例来说：如果指定的服务既支持TCP也支持UDP，那么调用者可以把hints结构中的ai_socktype成员设置成SOCK_DGRAM使得返回的仅仅是适用于数据报套接口的信息。
+result：本函数通过result指针参数返回一个指向addrinfo结构体链表的指针。
+返回值：0——成功，非0——出错
+*/
+//如果本函数返回成功，那么由result参数指向的变量已被填入一个指针，它指向的是由其中的ai_next成员串联起来的addrinfo结构链表
+//The getaddrinfo function allows us to map a host name and a service name to an address
+int getaddrinfo( const char *hostname, const char *service, const struct addrinfo *hints, struct addrinfo **result );
+
+void freeaddrinfo(struct addrinfo *res);  
+const char *gai_strerror(int errcode); //If getaddrinfo fails,we need to call gai_strerrorto convert the error code returned into an error message  //getnameinfo 也用 gai_strerror 收集错误信息
+
+
+//The getnameinfo function converts an address into a host name and a service name
+int getnameinfo(const struct sockaddr *sa, socklen_t salen, char *host, size_t hostlen, char *serv, size_t servlen, int flags);
+
+
+
+打印 addrinfo 的函数——print_ai
+#include <netdb.h>
+struct addrinfo {
+	int	ai_flags;	/* AI_PASSIVE, AI_CANONNAME, AI_NUMERICHOST */
+	int	ai_family;	/* PF_xxx */
+	int	ai_socktype;	/* SOCK_xxx */
+	int	ai_protocol;	/* 0 or IPPROTO_xxx for IPv4 and IPv6 */
+	socklen_t ai_addrlen;	/* length of ai_addr */
+	char	*ai_canonname;	/* canonical name for hostname */
+	struct	sockaddr *ai_addr;	/* binary address */
+	struct	addrinfo *ai_next;	/* next structure in linked list */
+};
