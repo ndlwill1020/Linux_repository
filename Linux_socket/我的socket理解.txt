@@ -74,14 +74,15 @@ memset(&s_addr_in, 0, sizeof(s_addr_in));
 s_addr_in.sin_family = AF_INET;
 s_addr_in.sin_port = htons(45683);
 //s_addr_in.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr()  将字符串转换成网络字节序的IPv4地址 不推荐＃＃＃
-用下面的 它不仅可以用于转换IPv4地址，还可以用来转换IPv6的地址
-#include <arpa/inet.h>
+用下面的 它不仅可以用于转换IPv4地址，还可以用来转换IPv6的地址＃＃＃
+#include <arpa/inet.h>   //ip字符串－》网络字节流
 inet_pton(<#int#>, <#const char *#>, <#void *#>)//把字符串转换成ip地址(网络字节序 32位整数)保存在dst中 调用成功返回大于0的整数  void*表示“任意类型的指针”
 //转换IPv4的地址
 if(inet_pton(AF_INET, "192.168.2.1", &s_addr_in.sin_addr.s_addr) <= 0){//
 	//error TODO
 }
 
+//网络字节流－》ip字符串
 inet_ntop(<#int#>, <#const void *#>, <#char *#>, <#socklen_t#>)//将网络字节序的ip地址转换成字符串保存在buf中作为返回值返回
 %s  inet_ntop(AF_INET, &s_addr_in.sin_addr.s_addr, buf, sizeof(buf))
 
