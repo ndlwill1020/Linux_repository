@@ -1,0 +1,13 @@
+//下载
+wget http://xxx.org/xxx-1.4.tar.gz
+
+//通过源码安装软件
+解压源码包,阅读readme或install文件
+执行./configure生成Makefile文件(没有扩展名的)
+执行make指令进行编译(根据Makefile文件来编译) 
+执行make install
+
+./configure -help
+
+//加参数设置安装目录 默认安装在/usr/local
+./configure --prefix=/../../xx 

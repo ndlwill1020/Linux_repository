@@ -1,0 +1,45 @@
+linux支持的压缩格式
+*.Z compress程序压缩文件
+*.gz gzip程序压缩文件
+*.bz2 bzip2程序压缩文件
+*.tar tar程序打包文件，并未压缩
+*tar.gz 先tar打包，使用gzip压缩
+*tar.bz2 先tar打包，使用bzip2压缩
+
+
+压缩指令：
+gzip [参数-cdtv#] 文件名称
+-c:将压缩的数据输出到屏幕上
+-d:解压缩的参数
+-t
+-v：显示和原文件对比的压缩比
+
+bzip2 [-cdkzv#] 文件名称
+-c:将压缩的数据输出到屏幕上
+-d:解压缩的参数
+-k:保留原文件并不删除原始文件
+-z:压缩的参数
+
+打包指令：
+//将某个文件或目录打包并使用bzip2压缩成一个文件
+tar [-jcv] -f name.tar.bz2 待压缩的文件或目录名
+-j：通过bz2进行压缩或解压缩
+-z: 通过gzip进行压缩或解压缩
+-c:建立打包档案
+-v：将正在处理的文件名显示出来
+-f：单独写一个选项，紧跟要被处理的文件名
+
+//将压缩文件解压缩到指定目录
+tar [-jxv] -f name.tar.bz2 -C 解压缩的目录
+-x:解压缩文件，和-C搭配使用解压缩到指定目录
+
+
+eg:
+tar -cf ndl.tar ndl
+或tar -c -f ndl.tar ndl
+
+tar -cv -f ndl.tar ndl
+tar -xv -f ndl.tar -C cc
+
+tar -jcv -f ndl.tar.bz2 ndl //打包bz2压缩
+tar -jxv -f ndl.tar.bz2 -C jdj //bz2解压缩

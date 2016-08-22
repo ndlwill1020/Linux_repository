@@ -1,0 +1,59 @@
+用户群组权限######
+
+每个文件都有owner 并且owner属于某个Group
+
+User用户：
+User信息存储在/etc/passwd中
+每个用户有一个唯一的User ID
+每个User都有一个home目录
+root用户 超级管理员
+
+Group群组：
+具有唯一标识符gid
+Group信息存储在/etc/group中
+
+系统会为每个User关联一个和User同名的Group
+User也可以加入其他的Group
+同一个Group的成员可以共享其他成员的文件
+
+权限：
+只读权限 r  可以读取文件或列出目录的内容（ls）
+可写权限 w  可以写、删除文件或者目录
+可执行权限 x 可以执行可执行文件  可以进入目录并使用cd切换进入目录
+没有任何权限用-表示
+
+eg：权限解读
+d rwx rwx rwx 
+d:目录 -：文件
+第一个rwx 当前这个文件或目录的所有者对它的权限
+第二个rwx 当前这个文件或目录所属的用户群组对它的权限
+第三个rwx 其他用户，其他群组对它的权限
+
+
+改变所有者：
+ndl目录的所有者是root
+chown ndlwill ndl/ 改变ndl目录的所有者为ndlwill
+
+root不受权限的限制 都能访问
+
+改变权限:
+chmod 777 ndl/  改变ndl目录的权限
+数字表示法：
+十进制：
+permission	digit
+r			4
+w			2
+x			1
+-			0
+二进制：
+r-x --- rwx
+101 000 111  (转成十进制507)
+
+chmod ug+w ndl
+chmod -R ug+w ndl //ndl的子目录和文件都会被同步修改权限（递归的）
+chmod a= ndl //3者没有任何权限
+模式类别:
+who		operator		permission
+u,g,o,a  +,-,=			r,w,x
+
+

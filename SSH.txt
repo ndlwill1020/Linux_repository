@@ -1,0 +1,41 @@
+远程会话
+
+SSH: Secure Shell 
+C/S架构
+
+ubuntu:安装SSH服务
+apt-get install openssh-server openssh-client
+
+ssh默认端口 22
+
+//ssh服务端配置文件默认路径  ###可以配置访问策略
+/etc/ssh/sshd_config
+eg: vim sshd_config
+DenyUsers test //禁止test用户登录
+AllowUsers test //允许test用户登录
+DenyGroups test //禁止test群组登录
+AllowGroups test //允许test群组登录
+配置好需重新启动服务
+service sshd restart
+
+基于密钥（密钥对）的登录方式不需要验证
+
+
+运维：
+ssh执行远程主机命令的格式
+ssh username@hostname 'command'
+//显示时间 格式化
+date +%Y-%m-%d\ %H-%M-%S
+//当前是root@host1            echo $HOSTNAME(输出变量的值)
+ssh root@host2 'echo ${HOSTNAME}:'date +%Y-%m-%d\ %H-%M-%S'' >> remote.txt
+
+ssh运维参数
+-i 指定密钥路径
+-p 指定ssh端口
+-l 指定用户
+-F 指定配置文件
+-t 指定为终端迫使ssh客户端以交互模式工作
+ssh -l test 192.168.1.10 -i ~/myKey -p 2015 -F ~/myconfig
+
+
+

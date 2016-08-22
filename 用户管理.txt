@@ -1,0 +1,29 @@
+处于root账号
+
+//新建用户
+useradd [-u UID] [-g 初始群组] [-G 次要群组] [-mM] [-c说明] [-d 家目录] [-s shell]
+-u：制定UID给该账号
+-g:指定一个主要群组名称，会修改passwd文件，如果不指定这个-g，主要群组的名称会和user的名称相同  /etc/passwd
+-G：指定次要群组的名称，会修改group文件
+-M：强制不创建用户家目录，系统账号默认
+-m：强制建立用户家目录，一般账号默认
+-c：passwd文件的第五个字段的说明文字
+-d：指定用户家目录的位置，不要使用默认的值
+
+
+useradd -u 510 user1
+
+//修改用户信息
+usermod [-cdegGlsuLU] username
+-e:指定用户账号禁用的日期
+-a：与—G合用，可增加次要群组
+-l：将当前账号的名称重命名为指定名称
+-L：冻结用户
+-U：解冻用户
+
+usermod -a -G user4 user3//user3的次要群组增加user4
+
+
+//删除用户
+userdel [-r] username
+-r:连同用户家目录一起删除

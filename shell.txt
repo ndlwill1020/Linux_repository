@@ -1,0 +1,81 @@
+shell
+
+[root]#  切换到普通用户 su - ndl
+[普通用户]$
+
+//sudo 超级管理员
+sudo apt-get install curl//安装curl
+
+./install.sh  //XXX.sh是可执行程序  Ubuntu系统下
+
+ifconfig 查看ip
+whoami 查看当前用户名
+pwd 查看当前目录
+mkdir linux 创建目录linux（目录区分大小写）
+touch ndl.txt 创建文件ndl.txt（文件区分大小写 eg:NDL.txt）
+file ndl 查看ndl的文件类型
+
+//把字符串sshd:192.168.1.103写入到hosts.deny文件
+echo 'sshd:192.168.1.103' >> /etc/hosts.deny
+
+cat 查看文件内容
+cat ndl.txt
+
+//把ndl文件的内容写入到jdj文件
+cat ndl.txt >> jdj.txt
+
+less 分页查看文件
+
+
+ls:
+ls 列出当前目录下的内容
+ls / 表示显示根目录的内容（显示特定目录）
+ls -l 列出当前目录下的详细信息
+所具有的权限，文件数量，拥有者（用户），所属群组，大小(字节)，创建日期（最终修改时间），名字
+ls -lh 上面的大小显示为多少k 显示直观为了
+
+ls -a 当前目录下的隐藏文件或目录也会列出
+ls -la 上面两个参数联合使用
+ls -ld 显示当前目录的属性（详细信息）
+
+ls -la /home
+ls --help
+
+rm:删除文件和目录
+rm -rf ndl.txt 删除文件
+eg: rm -rf f[123].txt 会删除f1,f2,f3.txt文件    [123]是个正则表达式
+rm f*.txt    f* 表示删除以f开头的所有文件
+rm -f 1.txt 删除不询问是否删除
+rm -r ndl 删除目录 -r表示递归删除 删除会询问是否删除
+rm -rf ndl 上面两个参数联合使用
+
+
+
+cd:切换目录
+cd .. 进入上层目录
+cd  ~ 切换到当前用户的home（家）目录
+cd - 切换到上次的目录
+cd /    //cd到根目录
+
+cp:复制
+cp（-p）ndl.txt jdj 复制ndl.txt到当前目录下的jdj目录下   加了-p参数表示文件的时间为原来的时间，不变为现在的时间
+cp 1.txt 2.txt jdj 复制多个文件
+cp -r ndl jdj 复制目录要加-r参数 表示将目录下的文件都复制过去
+
+mv:移动或重命名
+重命名 mv ndl ndlwill
+移动 mv ndlwill/ jdj/
+
+切换到某个用户：
+groups //显示他的群组信息
+
+处于root账号：
+root切换到其他用户不需要密码，一个用户切换到另一个用户需要密码
+passwd user2//给user2设置或修改密码 
+/etc/shadow //可查看密码和用户是否被冻结
+finger //查看用户登录信息
+finger user1(user1是用户名)
+id //查看用户信息
+id user1
+
+
