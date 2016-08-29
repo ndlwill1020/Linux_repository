@@ -1,0 +1,104 @@
+FTP服务：文件传输服务,本质上是一个应用程序，用于互联网上控制文件的双向传输
+FTP:File Transfer Protocol(文件传输协议)
+
+VSFTP:Very Secure FTP     Linux系统下使用最多的FTP服务端
+
+ubuntu：
+apt-get install vsftpd
+
+启动服务
+service vsftpd start
+关闭服务
+service vsftpd stop
+重启服务
+service vsftpd stop
+查看服务
+service vsftpd status
+
+FTP会话的两个通道：控制通道和数据通道
+控制通道：和FTP服务器进行沟通的通道，连接FTP，发送FTP指令
+数据通道：和FTP服务器进行文件传输或列表的通道
+
+主动模式：
+服务端FTP端口固定为21
+服务端20端口把数据传给客户端
+
+被动模式：
+客户端自己去服务端的大于1024的随机端口取数据
+
+standlone模式设置方法：
+/etc/xinetd.d/vsftpd设置disable = yes
+修改/etc/vsftpd/vsftpd.conf Listen= YES
+重启VSFTP服务service vsftpd restart
+
+ftp 192.168.1.11
+//ftp命令
+help
+get test.txt  //下载文件
+put //上传文件
+close //断开连接
+bye 
+
+
+开启ftp匿名用户：
+修改VSFTP主配置文件 /etc/vsftpd/vsftpd.conf   anonymous_enable = YES
+浏览器：ftp://192.168.1.11
+
+/etc/vsftpd/ftpusers ftp用户黑名单
+/etc/vsftpd/user_list控制用户登录
+
+
+主配置文件解析/etc/vsftpd/vsftpd.conf
+anon_upload_enable = YES 是否允许匿名用户上传
+//下面两条命令一起使用才起效
+chroot_list_enable = YES锁定用户在家目录
+chroot_list_file = /etc/vsftpd/chroot_list此文件中的用户将启用chroot
+listen = YES 独立模式
+
+//用户访问控制
+userlist_enable = YES/NO //NO user_list文件不起效（/etc/vsftpd/目录下的user_list） /etc/vsftpd/ftpusers文件中的用户在任何情况下都不能登录FTP服务
+userlist_deny = YES/NO
+
+userlist_enable = YES，userlist_deny = YES时user_list文件中的用户不能登录FTP，列表外的可以登录
+userlist_enable = YES，userlist_deny = NO时user_list文件中的用户能登录FTP，列表外的不可以登录
+
+FTP错误代码规则：
+2开头--成功
+3开头--权限问题
+4开头--文件问题
+5开头--服务器问题
+
+
+自动化运维实战：
+touch ftp_auto.sh
+vim ftp_auto.sh
+
+#------sh begin
+mkdir -p /tmp/log
+#定义变量
+ip=$1
+user=$2
+password=$3
+
+localdir=/tmp/log
+remotedir=log
+dirlist="/tmp/${ip}.list"
+tarpath="/tmp/${ip}.tar.gz"
+
+echo "Downloading..."
+ftp -ivn $ip << EOF
+user $user $password
+lcd $loacldir
+cd $remotedir
+nlist *.log $dirlist
+mget *.log
+bye
+EOF
+tar zcvf $tarpath $localdir
+echo "tar files in $tarpath successful."
+
+rm -rf $localdir/*
+#------sh end
+
+chmod +x ftp_auto.sh
+./ftp_auto.sh 192.168.1.12 ndl admin123

@@ -28,7 +28,16 @@ int connect(int sockfd, struct sockaddr *serv_addr, int addrlen);//返回0成功
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 3.关闭套接字 ＃include <unistd.h>
 int close(int sockfd)//成功返回0 失败－1  close要等待关闭过程完成才返回
+close只是将socket fd引用计数减1，引用计数为0时，才真正的关闭套接字
+读写双端关闭
 
+/*
+howto:
+SHUT_RE关闭读
+SHUT_WR关闭写
+SHUT_RDWR同时关闭读写
+*/
+int shutdown(int sockfd, int howto);//立即关闭
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 4.socket I/O
 
@@ -61,7 +70,7 @@ while(){
 第三个参数为数据长度。
 最后一个参数有点特殊，这个参数是为了让BSD Socket能支持“带外数据”，何谓“带外数据”？顾名思义，就是“带内以外的数据”，而带内数据就是常规的按照Socket字节流顺序进行传递的数据。通常情况下，数据由连接的一端流到接收的一端，并且认为数据的所有字节都是精确排序的，晚写入的字节绝不会早于先写入的字节到达。但是如果我们“挂断了电话”，而接收方还有大量已经被接收的缓冲数据，这些数据还没被程序读取，那么接收方需要在读取这些缓冲的“带内数据”之前先读取一个标识取消的请求，这个请求就可以利用带外请求的方法进行传送。请求带外数据传送需要把标识位置为MSG_OOB
 int send(int sockfd, const void *msg, int len, int flags);
-int recv(int sockfd,void *buf,int len,unsigned int flags);
+int recv(int sockfd,void *buf,int len,unsigned int flags);//flags:MSG_WAITALL 读操作读取到一定数量字节后返回 MSG_PEEK查看读缓冲区的数据而不取出
 
 
 

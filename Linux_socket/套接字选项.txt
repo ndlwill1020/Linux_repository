@@ -3,19 +3,31 @@ int setsockopt(int sockfd, int level,int optname,void* optval,socklen_t optlen);
 int getsockopt(int sockfd, int level,int optname,const void* optval,socklen_t optlen);
 //都是成功返回0 失败－1并设置errno
 
+错误代码：
+EBADF 参数sockfd不是有效的文件描述符
+EFAULT optval指向的内存不是有效的进程空间
+EINVAL 在调用setsockopt()时，optlen无效
+ENOPROTOOPT 指定的协议层不能识别选项
+ENOTSOCK sockfd描述的不是套接字描述符
 
 int setsockopt(int sockfd, int level,int optname,void* optval,socklen_t optlen);
 参数解析：
-level:  对于socket编程：level一般为SOL_SOCKET
+level:  分为3类
+对于socket编程（通用套接字选项）：level一般为SOL_SOCKET
+IP选项：level为IPPROTO_IP
+TCP选项：level为IPPROTO_TCP
+
 optname:  选项名
 optval: 指向存放选项值的缓冲区
 optlen:optval缓冲区长度
 
+=========================================通用套接字选项：
+－－－－－－－－－－－－－－－－－－－
 
 选项名称　　　　　　　　说明　　　　　　　　　　　　　　　　　　数据类型
 SO_KEEPALIVE　　　　　　保持连接　　　　　　　　　　　　　　　　int
 SO_LINGER　　　　　　　 延迟关闭连接　　　　　　　　　　　　　　struct linger
-－－－－－－－－－－－－－－－－－－－
+
 SO_KEEPALIVE  检测对端是否处于连接中  (心跳机制)
 eg:
 int optval = 1;
@@ -29,3 +41,31 @@ struct linger so_linger;
 so_linger.l_onoff = 1;//表示是否延时关闭socket  l_onoff为0，则延迟关闭特性就被取消
 so_linger.l_linger = 500;//设置等待时间  单位为秒
 setsockopt(clientSocket, SOL_SOCKET, SO_LINGER, (const char*)&so_linger, sizeof(so_linger));
+
+－－－－－－－－－－－－－－－－－－－
+SO_RCVBUF和SO_SNDBUF缓冲区大小选项：
+在connect()函数调用前设置
+
+－－－－－－－－－－－－－－－－－－－
+SO_RCVTIMEO接收超时
+SO_SNDTIMEO发送超时
+设置通过一个结构体：
+struct timeval{
+	time_t tv_sec;
+	sseconds_t tv_usec;
+};
+
+－－－－－－－－－－－－－－－－－－－
+SO_RCVLOWAT和SO_SNDLOWAT表示接收缓冲区和发送缓冲区的低水位标记
+
+－－－－－－－－－－－－－－－－－－－
+SO_REUSEADDR地址可重用选项
+
+int reuse = 1；
+setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&reuse,sizeof(reuse))
+
+=========================================TCP选项:
+TCP_KEEPALIVE用来获取或设置存活探测的时间间隔
+int alivetime = 60;
+int fd = socket(AF_INET,SOCK_STREAM, 0);
+setsockopt(fd, IPPROTO_TCP, TCP_KEEPALIVE, &alivetime, sizeof(alivetime));

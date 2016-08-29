@@ -1,0 +1,20 @@
+Ctrl+Alt把鼠标从虚拟机切换到windows
+
+安装完ubuntu，第一次进入操作系统，要设置一个root用户
+在终端：sudo passwd root
+从普通用户切换到root用户：su root   //exit    退出root，回到普通用户
+
+vm设置共享文件夹，终端查看:
+cd /mnt/hgfs
+ls
+将配置文件放在windows的共享文件夹下
+
+下载软件：
+将配置文件sources.list拷贝到/etc/apt下面
+apt-get update
+如果出现错误:rm -f /var/lib/apt/lists/*
+apt-get update
+apt-get install vim
+
+配置vim：
+将vimrc配置文件拷贝到~/.vimrc
