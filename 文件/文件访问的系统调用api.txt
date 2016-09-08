@@ -18,6 +18,13 @@ O_CREAT  如果文件不存在，按照mode指定文件权限来创建文件
 O_TRUNC  如果打开的文件是已经存在的普通文件＃，并指定了写的标志，打开文件时消除源文件的所有内容
 O_NONBLOCK 文件打开后，对这个文件描述符的所有操作都以非阻塞方式进行
 
+
+open：
+O_RDWR 读写的方式 相当于流里面的r＋
+O_RDWR ｜ O_TRUNC  相当于流里面的w＋
+O_RDWR ｜ O_APPEND  相当于流里面的a＋
+O_RDWR ｜ O_CREAT 读写的方式打开，创建新文件
+
 flags可通过fcntl()系统调用来改变
 
 2.int close(int fd) 关闭指定文件描述符的文件  成功0 失败返回－1

@@ -63,16 +63,63 @@ while(){
 3.套接字关闭
 4.阻塞时收到了信号
 
-
+----------------------------------------------------
 //send  &&  recv   ＃include <sys/socket.h>
 第一个参数为套接字的句柄。
 第二个参数为数据缓冲区。
 第三个参数为数据长度。
 最后一个参数有点特殊，这个参数是为了让BSD Socket能支持“带外数据”，何谓“带外数据”？顾名思义，就是“带内以外的数据”，而带内数据就是常规的按照Socket字节流顺序进行传递的数据。通常情况下，数据由连接的一端流到接收的一端，并且认为数据的所有字节都是精确排序的，晚写入的字节绝不会早于先写入的字节到达。但是如果我们“挂断了电话”，而接收方还有大量已经被接收的缓冲数据，这些数据还没被程序读取，那么接收方需要在读取这些缓冲的“带内数据”之前先读取一个标识取消的请求，这个请求就可以利用带外请求的方法进行传送。请求带外数据传送需要把标识位置为MSG_OOB
-int send(int sockfd, const void *msg, int len, int flags);
-int recv(int sockfd,void *buf,int len,unsigned int flags);//flags:MSG_WAITALL 读操作读取到一定数量字节后返回 MSG_PEEK查看读缓冲区的数据而不取出
+int send(int sockfd, const void *msg, int len, int flags); //根据返回值来判断数据是否发送完毕
+int recv(int sockfd,void *buf,int len,unsigned int flags); //根据返回值来判断数据是否接收完毕 返回值－1表示发生错误
 
+recv的flags:
+MSG_DONTWAIT 非阻塞操作，立即返回，不等待
+MSG_WERRQUEUE 错误消息从套接字错误队列接受
+MSG_OOB 接受带外数据
+MSG_PEEK 查看数据，不进行数据缓冲区的清空（查看读缓冲区的数据而不取出）
+MSG_TRUNC 返回所有的数据
+MSG_WAITALL 等待所有消息(读操作读取到一定数量字节后才返回)
 
+recv的errno:
+EAGIN 	套接字定义为非阻塞，操作采用了阻塞
+EBADF	参数sockfd不是合法的描述符
+EINTR	接收到中断信号
+EINVAL	传递了不合法参数
+EFAULT	接收缓冲区指针在此进程之外
+ECONNREFUSED	远程主机不允许此操作
+
+send的errno:
+EACCES	套接字不可写
+EPIPE	套接字已经关闭
+ENOTCONN	套接字没有连接
+ENOMEM	没有足够内存
+ECONNRESET	连接断开
+----------------------------------------------------
+readv() & writev()
+#include <sys/uio.h>
+ssize_t readv(int fd, struct iovec* vector, int count);
+ssize_t sendv(int fd, const struct iovec* vector, int count);
+
+struct iovec{
+	void* iov_base;//缓冲开始地址
+	size_t iov_len;//缓冲长度
+};
+
+----------------------------------------------------
+recvmsg() & sendmsg()
+#include <sys/socket.h>
+ssize_t recvmsg(int fd, struct msghdr* msg, int flags);
+ssize_t sendmsg(int fd, struct msghdr* msg, int flags);
+
+struct msghdr{
+	void* msg_name;
+	socklen_t msg_namelen;
+	struct iovec* msg_iov;
+	int msg_iovlen;
+	void* msg_control;
+	socklen_t msg_controllen;
+	int msg_flags;
+}
 
 ===============================================================
 server  先读再写
