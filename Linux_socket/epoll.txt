@@ -1,0 +1,41 @@
+IO复用系统调用之epoll
+
+#include <sys/epoll.h>
+int epoll_create(int size);
+
+#include <sys/epoll.h>
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event* event);
+
+op参数:
+EPOLL_CTL_ADD 往事件表中注册fd上的事件
+EPOLL_CTL_MOD 修改fd上的注册事件
+EPOLL_CTL_DEL 删除fd上的注册事件
+
+struct epoll_event{
+	__unit32_t events;//epoll事件表	
+	epoll_data_t data;//用户数据
+}；
+
+typedef union epoll_data{
+	void* ptr;
+	int fd;
+	uint32_t u32;
+	uint64_t u64;
+} epoll_data_t;
+
+#include <sys/epoll.h>
+//从内核就把就绪的事件拷贝到这边的events
+int epoll_wait(int epfd, struct epoll_event* events, int maxevents, int timeout);//成功返回就绪的文件描述符的个数  失败：－1
+
+
+epoll工作模式：
+LT 套接字就绪后，用户程序没有处理完，epoll会继续提醒
+ET 高效模式，套接字就绪后，epoll只提醒一次，用户程序必须将其对应事件处理完
+
+eg:得到就绪事件
+int ret = epoll_wait(epollfd, events, MAX_SOCKET_NUMBERS, -1);
+
+for(int i = 0; i < ret; i++){
+	int sockfd = events[i].data.fd;
+
+}

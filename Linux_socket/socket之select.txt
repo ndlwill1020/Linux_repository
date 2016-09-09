@@ -3,7 +3,7 @@
 IO多路复用之select系统调用:
 比如服务器端发送消息之后就等客户端发送消息了，没有接受到客户端的消息之前服务器端是没有办法发送消息的。使用select可以解决这个问题
 
-使用select()时，我们通知内核我们对哪些文件描述符感兴趣（读，写或异常条件）以及等待多少时间，select()回会替我们测试文件描述符是否准备好
+使用select()时，我们通知内核我们对哪些文件描述符感兴趣（读，写或异常条件）以及等待多少时间，select()会替我们测试文件描述符是否准备好
 
 select这个系统调用，是一种多路复用IO方案，可以同时对多个文件描述符进行监控，从而知道哪些文件描述符可读，可写或者出错，不过select方法是阻塞的，可以设定超时时间。 select使用的步骤如下:
 1.创建一个fd_set变量（fd_set实为包含了一个整数数组的结构体），用来存放所有的待检查的文件描述符
@@ -33,7 +33,7 @@ struct timeval* timeout是select的超时时间，要等待的时间是秒数和
 
 
 //返回值：就绪描述符的数目（正数），超时返回0，出错返回-1并设置errno
-int select(int maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout);
+int select(int maxfdp,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout);//可以监听多个文件描述符
 
 /*参数列表
 int maxfdp是一个整数值，指定待测试的描述字个数,它的值是待测试的最大描述字加1（因此把该参数命名为maxfdp1），描述字0、1、2...maxfdp1-1均将被测试。因为文件描述符是从0开始的 #####
@@ -44,6 +44,7 @@ fd_set *writefds是指向fd_set结构的指针，这个集合中应该包括文�
 　　
 fd_set *errorfds同上面两个参数的意图，用来监视文件错误异常。 
 */
+
 
 FD_ZERO(fd_set *set);//把set指向的文件描述符集合（即fd_set）对应的位全部初始化为0
 FD_SET(int fd, fd_set *set);//将set指向的文件描述符集合中对应文件描述符fd的位 置为1
@@ -62,4 +63,26 @@ select()返回时将修改由指针readset，writeset和exceptset所指的文件
 
 常见问题：
 当套接字关闭或出错时，select()返回套接字可读可写，所以要检查read()和write()的返回值判断是否连接已经关闭
+
+
+－－－－－－－－－－－－－－－－－－－－－－
+socket可读的条件：
+socket中字节大于低水位   //socket内核接收缓冲区的字节数大于等于低水位
+socket对方关闭连接  //socket读取0
+监听socket上有新的连接
+socket上有待处理的错误  //getsockopt来读取或清除错误
+
+socket可写的条件：
+socket中发送缓冲区字节大于低水位
+socket对方写操作关闭
+socket上使用非阻塞connect连接成功或者失败后
+socket上有未处理的错误
+
+select可以处理带外数据
+
+select缺点：
+单个进程可监视的fd数量有限制
+对socket采用轮询的方法
+需要维护一个用来存放大量fd的数据结构
+
 
