@@ -38,6 +38,12 @@ SHUT_WR关闭写
 SHUT_RDWR同时关闭读写
 */
 int shutdown(int sockfd, int howto);//立即关闭
+howto的值:
+1.SHUT_RD：值为0，关闭连接的读这一半。
+2.SHUT_WR：值为1，关闭连接的写这一半。
+3.SHUT_RDWR：值为2，连接的读和写都关闭。
+成功则返回0，错误返回1
+错误码errno：EBADF表示sockfd不是一个有效描述符；ENOTCONN表示sockfd未连接；ENOTSOCK表示sockfd是一个描述符而不是socket描述符
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 4.socket I/O
 
