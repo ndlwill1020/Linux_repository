@@ -1,0 +1,43 @@
+非阻塞socket:
+当发送缓冲区没有空间时会直接返回错误号EWOULDBLOCK,表示没有空间可写数据，如果错误号是别的值，则表明发送失败。
+当如果发送缓冲区中有足够空间或者是不足以拷贝所有待发送数据的空间的话，则拷贝前面N个能够容纳的数据，返回实际拷贝的字节数。
+
+阻塞Socket：
+当如果发送缓冲区没有空间或者空间不足的话，write操作会直接阻塞住，如果有足够空间，则拷贝所有数据到发送缓冲区，然后返回.
+
+非阻塞的write:
+int write_pos = 0;
+int nLeft = nLen;
+while (nLeft > 0)
+{
+ 	int nWrite = 0;
+
+ 	/*
+ 	write  send
+ 	 返回－1:
+ 	 中断，置errno为EINTR
+ 	 没有空间可写数据,EWOULDBLOCK
+
+ 	 返回0:
+ 	 出错
+ 	*/
+ 	if ((nWrite = write(sock_fd, data + write_pos, nLeft)) <= 0)
+ 	{
+  		if (errno == EWOULDBLOCK)
+        {
+   			nWrite = 0;
+   			//
+    	}else if (errno == EINTR) {
+    		//中断
+    	} else {
+    		return -1; //表示写失败
+    	}
+ 	}
+ 	nLeft -= nWrite;
+    write_pos += nWrite;
+}
+return nLen;
+
+
+EWOULDBLOCK用于非阻塞模式，不需要重新读或者写
+EINTR指操作被中断，需要重新读/写
