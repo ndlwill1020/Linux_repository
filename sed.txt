@@ -1,0 +1,34 @@
+非交互式的编辑器
+
+sed使用正则表达式默认贪婪模式
+
+命令格式：
+sed [-options] [commands] filename
+
+commands格式:
+[address-range][pattern-to-match][sed_command]
+
+sed -n '5,8p' passwd //打印出文件的第5到第8行 p打印 这边是用的寻址
+
+查找：打印以bash结尾 用//把正则表达式包含起来
+sed -n '/bash$/p' passwd   //-n取消sed默认打印，只打印匹配的
+
+删除：所有行以test开头
+sed -i '/^test/d' passwd //d删除 -i参数会直接操作源文件，不然源文件匹配的不会被删除
+
+打印截取以bash结尾的用户名和目录
+eg:
+root:x:0:0:root:/root:/bin/bash
+//s截取 存在\1 \2中
+sed -nr '/bash$/s/(\w+):\w:[0-9]+:[0-9]+:.*:(.*):.*/\1 \2/p' passwd
+
+替换：
+//s替换  把全部nologin替换为ndl
+sed -i 's/nologin/ndl/g' passwd
+
+插入：第5行上面插入hello
+sed -i '5i\hello' passwd
+第5行下面插入hello
+sed -i '5a\hello' passwd
+
+修改：
