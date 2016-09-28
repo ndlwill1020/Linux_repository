@@ -1,0 +1,82 @@
+struct stat{
+    mode_t st_mode;     //文件类型和权限信息
+    ino_t   st_ino;      //i结点标识
+    dev_t   st_dev;      //device number (file system)
+    dev_t   st_rdev;     //device number for special files
+    nlink_t st_nlink;    //符号链接数
+    uid_t   st_uid;      //用户ID
+    gid_t   st_gid;      //组ID
+    off_t   st_size;     //size in bytes,for regular files
+    time_t st_st_atime; //最后一次访问的时间
+    time_t st_mtime;    //文件内容最后一次被更改的时间
+    time_t st_ctime;    //文件结构最后一次被更改的时间
+    blksize_t st_blksize; //best I/O block size
+    blkcnt_t st_blocks; //number of disk blocks allocated
+   };
+
+#include<sys/stat.h>
+int stat(const char *restrict pathname,struct stat *restrict buf);
+int fstat(int fields,struct stat *buf);
+int lstat(const char *restrict pathname,struct stat *restrict buf);
+
+返回值:若成功则返回0,失败则返回-1
+
+一旦给出pathname,stat函数就返回与此命名文件有关的信息结构
+fstat函数获取已在描述符fields上打开文件的有关信息。
+lstat函数类似于stat.但是当命名的文件是一个符号链接时，lstat返回该符号链接的有关信息，而不是由该符号链接引用文件
+的信息。
+
+第二个参数buf是指针，它指向一个我们必须提供的结构，这些函数填写由buf指向的结构。
+
+文件类型：
+普通文件，目录文件，块特殊文件，字符特殊文件，套接字，FIFO，符号链接.
+文件类型信息包含在stat结构的st_mode成员中,可以用如下的宏确定文件类型,这些宏是stat结构中的st_mode成员.
+S _ I S R E G ( ) 普通文件
+S _ I S D I R ( ) 目录文件
+S _ I S C H R ( ) 字符特殊文件
+S _ I S B L K ( ) 块特殊文件
+S _ I S F I F O ( ) 管道或F I F O
+S _ I S L N K ( ) 符号连接（ P O S I X . 1或S V R 4无此类型）
+S _ I S S O C K ( ) 套接字（P O S I X . 1或S V R 4无此类型）
+
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <string.h>
+#include<sys/stat.h>
+int main()
+{
+DIR * dir_info; //目录指针
+struct dirent* dir_entry; //目录项信息指针
+int num=0;
+struct stat buf;
+char *ptr;
+//打开一个待扫描的目录
+dir_info = opendir("/home/user/app");
+if( dir_info ){
+//打开目录成功
+while ( (dir_entry = readdir(dir_info)) != NULL)
+{
+//忽略这两个特殊项目
+if(strcmp(dir_entry->d_name, "..")==0 || strcmp(dir_entry->d_name, ".")==0)
+continue;
+//具体操作。。。
+//plugin_create( srv, dir_entry->d_name );
+num++;
+printf("n%dn",num);
+   if(lstat(dir_entry->d_name,&buf)<0)
+               {
+                 perror("错误原因是:");
+                 continue;
+               }
+ if (S_ISREG(buf.st_mode))
+                ptr="普通文件";
+ if (S_ISDIR(buf.st_mode))
+                ptr="目录";
+
+printf(" %s",dir_entry->d_name);
+printf("  %s",ptr);
+} // while
+}
+}

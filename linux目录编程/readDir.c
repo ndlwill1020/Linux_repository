@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <string.h>
 
 //打开一个目录，读取目录里面的每一个文件的信息
 int main(int argc,char **argv)
@@ -39,10 +40,11 @@ int main(int argc,char **argv)
 			}
 		}
 		//如果目录中有ABC这个文件，就将目录定位到目录头重新读取目录    test for 目录定位
-		if(0 == strncmp("ABC",ent->d_name))
-		{
-			rewinddir(dir);
-		}
+		// if(0 == strncmp("ABC",ent->d_name))
+		// {
+		// 	rewinddir(dir);
+		// }
+		
 		//显示目录包含信息
 		printf("目录包含：%s\n",ent->d_name);
 	}
